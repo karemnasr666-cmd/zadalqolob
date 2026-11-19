@@ -1,0 +1,41 @@
+
+name: Build Zad Alqolob APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract Android project
+        run: |
+          unzip -o zad_alqolob_v9_android_project.zip -d android_project
+
+      - name: Find Gradle project
+        run: |
+          find android_project -name settings.gradle -o -name settings.gradle.kts
+
+      - name: Build APK
+        run: |
+          cd android_project
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: zad-alqolob-apk
+          path: android_project/**/build/outputs/apk/debug/*.apk
